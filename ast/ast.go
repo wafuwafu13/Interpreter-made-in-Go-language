@@ -23,7 +23,7 @@ type Program struct {
 // ノードが関連づけられているトークンのリテラル値を返す
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
-		return p.Statements[0].TokenLiteral()
+		return p.Statements[0].TokenLiteral() // [0]はlet
 	} else {
 		return ""
 	}
@@ -50,3 +50,12 @@ type Identifier struct {
 
 func (i *Identifier) expressionNode() {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
+
+// return <expression>
+type ReturnStatement struct {
+	Token       token.Token // 'return'トークン
+	ReturnValue Expression
+}
+
+func (rs *ReturnStatement) statementNode() {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }

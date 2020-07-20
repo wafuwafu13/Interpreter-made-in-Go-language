@@ -49,7 +49,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	for p.curToken.Type != token.EOF { // !p.curTokenIs(token.EOF)で代替できる
 		stmt := p.parseStatement() // &{{LET let} 0xc00010e390 <nil>}
 		if stmt != nil {
-			program.Statements = append(program.Statements, stmt)
+			program.Statements = append(program.Statements, stmt) // let から ; までの1文の解析結果を格納していく
 		}
 		p.nextToken() // 次のLETから始まるトークンを読んでいく
 	}
@@ -61,11 +61,14 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
+	case token.RETURN:
+		return p.parseReturnStatement()
 	default:
 		return nil
 	}
 }
 
+// let から ; までを解析する
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	// token.Letトークンに基づいて*ast.LetStatementノードを構築
 	stmt := &ast.LetStatement{Token: p.curToken} // &{{LET let} <nil> <nil>}
@@ -81,6 +84,19 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
+
+	// TODO: セミコロンに遭遇するまで式を読み飛ばしてしまっているので式はみていない
+	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	stmt := &ast.ReturnStatement{Token: p.curToken} // &{{RETURN return} <nil>}
+
+	p.nextToken()
 
 	// TODO: セミコロンに遭遇するまで式を読み飛ばしてしまっているので式はみていない
 	for !p.curTokenIs(token.SEMICOLON) {

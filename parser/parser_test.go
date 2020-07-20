@@ -1,7 +1,7 @@
 package parser
 
 import (
-	//"fmt"
+//	"fmt"
 	"testing"
 	"Interpreter-made-in-Go-language/ast"
 	"Interpreter-made-in-Go-language/lexer"
@@ -9,7 +9,7 @@ import (
 
 func TestLetStatements(t *testing.T) {
 	input := `
-let x = 5;
+let x = 5 + 5;
 let y = 10;
 let foobar = 838383;
 `
@@ -22,12 +22,13 @@ let foobar = 838383;
 	
 	p := New(l) // &{0xc0000103f0 [] {LET let} {IDENT x}}
 
-	program := p.ParseProgram()
+	program := p.ParseProgram() // inputの解析結果
 
 	checkParserErrors(t, p)
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
 	}
+	// let から ; までの1文の解析結果が3つ格納されている
 	if len(program.Statements) != 3 {
 		t.Fatalf("program.Statements does not contain 3 statements. got=%d", len(program.Statements))
 	}	
@@ -71,6 +72,36 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	}
 
 	return true
+}
+
+func TestRerutnStatements(t *testing.T) {
+	input := `
+return 5;
+return 10;
+return 993322;
+`
+	l := lexer.New(input)
+	p := New(l) // &{0xc0000103f0 [] {RETURN return} {INT 5}}
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	// return文の解析結果が3つ格納されている
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements does not contain 3 statements. got=%d", len(program.Statements))
+	}	
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.ReturnStatement, got=%T", stmt)
+			continue
+		}
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
+		}
+	}
+	
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
