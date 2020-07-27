@@ -46,7 +46,7 @@ func (l *Lexer) NextToken() token.Token {
 		if l.peekChar() == '=' {
 			ch := l.ch // 現在の文字を保存
 			l.readChar()
-			literal := string(ch) + string(l.ch)
+			literal := string(ch) + string(l.ch) // '=='
 			tok = token.Token{Type: token.EQ, Literal: literal}
 		} else {
 			tok = newToken(token.ASSIGN, l.ch)
