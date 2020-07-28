@@ -7,12 +7,31 @@ import (
 	"Interpreter-made-in-Go-language/token"
 )
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS      // ==
+	LESSGREATER // > または <
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X または !X
+	CALL        // myFunction(X)
+)
+
 type Parser struct {
 	l *lexer.Lexer
     errors []string
 	curToken  token.Token // 現在のトークン
 	peekToken token.Token // 次のトークン
+
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
 }
+
+type (
+	prefixParseFn func() ast.Expression // 前置構文解析関数
+	infixParseFn func(ast.Expression) ast.Expression // 中置構文解析関数 引数は中置演算子の左側
+)
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
@@ -24,7 +43,14 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 	p.nextToken()
 
+	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+
 	return p
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 func (p *Parser) Errors() []string {
@@ -64,7 +90,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressStatement()
 	}
 }
 
@@ -106,6 +132,28 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+func (p *Parser) parseExpressStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+
+	stmt.Expression = p.parseExpression(LOWEST) // もっとも低い優先順位
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type] // 0x11551f0
+	if prefix == nil {
+		return  nil
+	}
+	leftExp := prefix() // foobar
+
+	return leftExp
+}
+
 func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
@@ -122,4 +170,12 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.peekError(t)
 		return false
 	}
+}
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
 }
