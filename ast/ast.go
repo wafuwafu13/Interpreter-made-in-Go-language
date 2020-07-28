@@ -127,7 +127,7 @@ func (il *IntegerLiteral) expressionNode() {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string { return il.Token.Literal}
 
-// <prefix operator><expression>
+// <prefix operator> <expression>
 type PrefixExpression struct {
 	Token    token.Token // 前置トークン、例えば「!」
 	Operator string // 文字列、「"-"」か「"!"」
@@ -141,6 +141,28 @@ func (pe *PrefixExpression) String() string {
 	out.WriteString("(")
 	out.WriteString(pe.Operator)
 	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
+
+// <expression> <infix operator> <expression>
+type InfixExpression struct {
+	Token    token.Token // 演算子トークン、例えば「+」
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+func (oe *InfixExpression) expressionNode()      {}
+func (oe *InfixExpression) TokenLiteral() string { return oe.Token.Literal }
+func (oe *InfixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(oe.Left.String())
+	out.WriteString(" " + oe.Operator + " ")
+	out.WriteString(oe.Right.String())
 	out.WriteString(")")
 
 	return out.String()

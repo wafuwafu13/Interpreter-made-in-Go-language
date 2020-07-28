@@ -19,6 +19,19 @@ const (
 	CALL        // myFunction(X)
 )
 
+// トークンタイプとその優先順位を関連づける
+var precedences = map[token.TokenType]int{
+	token.EQ:       EQUALS,
+	token.NOT_EQ:   EQUALS,
+	token.LT:       LESSGREATER,
+	token.GT:       LESSGREATER,
+	token.PLUS:     SUM,
+	token.MINUS:    SUM,
+	token.SLASH:    PRODUCT,
+	token.ASTERISK: PRODUCT,
+	token.LPAREN:   CALL,
+}
+
 type Parser struct {
 	l *lexer.Lexer
     errors []string
@@ -49,6 +62,16 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.INT, p.parseIntergerLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+
+	p.infixParseFns = make(map[token.TokenType]infixParseFn)
+	p.registerInfix(token.PLUS, p.parseInfixExpression)
+	p.registerInfix(token.MINUS, p.parseInfixExpression)
+	p.registerInfix(token.SLASH, p.parseInfixExpression)
+	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(token.EQ, p.parseInfixExpression)
+	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
+	p.registerInfix(token.LT, p.parseInfixExpression)
+	p.registerInfix(token.GT, p.parseInfixExpression)
 
 	return p
 }
@@ -85,6 +108,35 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 	return expression
 }
 
+func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := &ast.InfixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+		Left:     left,
+	}
+
+	precedence := p.curPrecedence() // 最初の+
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence) // 2 (forループ実行されず返ってくる)
+
+	return expression
+}
+
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peekToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
+
+func (p *Parser) curPrecedence() int {
+	if p, ok := precedences[p.curToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
 
 func (p *Parser) Errors() []string {
 	return p.errors
@@ -183,12 +235,24 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	prefix := p.prefixParseFns[p.curToken.Type] // 0x11551f0
+	// トークンに関連づけられたprefixParseFnが存在するか確認
+	prefix := p.prefixParseFns[p.curToken.Type] // 0x11551f0 関数
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return  nil
 	}
-	leftExp := prefix() // foobar
+	leftExp := prefix() // 1 2
+
+	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() { // 1 < + ...
+		infix := p.infixParseFns[p.peekToken.Type]
+		if infix == nil {
+			return leftExp
+		}
+
+		p.nextToken()
+
+		leftExp = infix(leftExp) // leftExpはすでに構文解析済み 1, 1+2
+	}
 
 	return leftExp
 }
@@ -210,7 +274,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		return false
 	}
 }
-
+                                                           // ex) parseIdentifier()
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 	p.prefixParseFns[tokenType] = fn
 }
