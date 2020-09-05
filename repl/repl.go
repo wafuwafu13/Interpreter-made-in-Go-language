@@ -7,6 +7,7 @@ import (
 	"Interpreter-made-in-Go-language/token"
 	"Interpreter-made-in-Go-language/lexer"
 	"Interpreter-made-in-Go-language/parser"
+	"Interpreter-made-in-Go-language/evaluator"
 )
 
 const PROMPT = ">> "
@@ -29,6 +30,12 @@ func Start(in io.Reader, out io.Writer) {
 		if len(p.Errors()) != 0 {
 			printParserErrors(out, p.Errors())
 			continue
+		}
+
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
 		}
 
 		io.WriteString(out, program.String())
