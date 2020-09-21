@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"Interpreter-made-in-Go-language/object"
 )
 
@@ -21,6 +22,15 @@ var builtins = map[string]*object.Builtin{
 				args[0].Type())
 		}
 	}},
+	"puts": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+
+			return NULL
+		},
+	},
 	"first": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
