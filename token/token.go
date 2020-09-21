@@ -11,6 +11,8 @@ const (
 	ILLEGAL = "ILLEGAL" // トークンが未知であることを表す
 	EOF     = "EOF" // ファイルの終端を表し、構文解析器にここで停止してよいと伝える
 
+	STRING = "STRING"
+
 	// 識別子 + リテラル
 	IDENT = "IDENT" // add, foobar, x, y, ...
 	INT   = "INT" // 1232454
