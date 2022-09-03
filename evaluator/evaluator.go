@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"fmt"
 	"Interpreter-made-in-Go-language/ast"
 	"Interpreter-made-in-Go-language/object"
+	"fmt"
 )
 
 var (
@@ -47,7 +47,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
-	
+
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 
@@ -109,9 +109,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
-		
+
 	}
-    
+
 	return nil
 }
 
@@ -171,7 +171,7 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 	if isError(condition) {
 		return condition
 	}
-	
+
 	if isTruthy(condition) {
 		return Eval(ie.Consequence, env)
 	} else if ie.Alternative != nil {
@@ -370,7 +370,6 @@ func isTruthy(obj object.Object) bool {
 func newError(format string, a ...interface{}) *object.Error {
 	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }
-
 
 func isError(obj object.Object) bool {
 	if obj != nil {

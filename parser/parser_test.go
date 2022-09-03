@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"fmt"
-	"testing"
 	"Interpreter-made-in-Go-language/ast"
 	"Interpreter-made-in-Go-language/lexer"
+	"fmt"
+	"testing"
 )
 
 func TestLetStatements(t *testing.T) {
@@ -81,7 +81,7 @@ return 993322;
 	// return文の解析結果が3つ格納されている
 	if len(program.Statements) != 3 {
 		t.Fatalf("program.Statements does not contain 3 statements. got=%d", len(program.Statements))
-	}	
+	}
 
 	for _, stmt := range program.Statements {
 		returnStmt, ok := stmt.(*ast.ReturnStatement)
@@ -93,7 +93,7 @@ return 993322;
 			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
 		}
 	}
-	
+
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
@@ -173,9 +173,9 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
-		input        string
-		operator     string
-		value interface {}
+		input    string
+		operator string
+		value    interface{}
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
@@ -214,9 +214,9 @@ func TestParsingPrefixExpressions(t *testing.T) {
 func TestParsingInfixExpressions(t *testing.T) {
 	infixTests := []struct {
 		input      string
-		leftValue  interface {}
+		leftValue  interface{}
 		operator   string
-		rightValue interface {}
+		rightValue interface{}
 	}{
 		{"5 + 5;", 5, "+", 5},
 		{"5 - 5;", 5, "-", 5},

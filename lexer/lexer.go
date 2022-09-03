@@ -3,9 +3,9 @@ package lexer
 import "Interpreter-made-in-Go-language/token"
 
 type Lexer struct {
-	input        string 
-	position     int // 入力における現在位置  l.input[l.readPosition]のように使う
-	readPosition int // これから読み込む位置
+	input        string
+	position     int  // 入力における現在位置  l.input[l.readPosition]のように使う
+	readPosition int  // これから読み込む位置
 	ch           byte // 現在検査中の文字
 }
 
@@ -54,15 +54,15 @@ func (l *Lexer) NextToken() token.Token {
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
-    case ';':
-    	tok = newToken(token.SEMICOLON, l.ch)
-    case '(':
-    	tok = newToken(token.LPAREN, l.ch)
-    case ')':
-    	tok = newToken(token.RPAREN, l.ch)
-    case ',':
-    	tok = newToken(token.COMMA, l.ch)
-    case '+':
+	case ';':
+		tok = newToken(token.SEMICOLON, l.ch)
+	case '(':
+		tok = newToken(token.LPAREN, l.ch)
+	case ')':
+		tok = newToken(token.RPAREN, l.ch)
+	case ',':
+		tok = newToken(token.COMMA, l.ch)
+	case '+':
 		tok = newToken(token.PLUS, l.ch)
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
@@ -83,9 +83,9 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LT, l.ch)
 	case '>':
 		tok = newToken(token.GT, l.ch)
-    case '{':
-    	tok = newToken(token.LBRACE, l.ch)
-    case '}':
+	case '{':
+		tok = newToken(token.LBRACE, l.ch)
+	case '}':
 		tok = newToken(token.RBRACE, l.ch)
 	case '[':
 		tok = newToken(token.LBRACKET, l.ch)
@@ -158,4 +158,3 @@ func (l *Lexer) readNumber() string {
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
-

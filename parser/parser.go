@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"fmt"
 	"Interpreter-made-in-Go-language/ast"
 	"Interpreter-made-in-Go-language/lexer"
 	"Interpreter-made-in-Go-language/token"
+	"fmt"
 	"strconv"
 )
 
@@ -35,8 +35,8 @@ var precedences = map[token.TokenType]int{
 }
 
 type Parser struct {
-	l *lexer.Lexer
-    errors []string
+	l         *lexer.Lexer
+	errors    []string
 	curToken  token.Token // 現在のトークン
 	peekToken token.Token // 次のトークン
 
@@ -45,8 +45,8 @@ type Parser struct {
 }
 
 type (
-	prefixParseFn func() ast.Expression // 前置構文解析関数
-	infixParseFn func(ast.Expression) ast.Expression // 中置構文解析関数 引数は中置演算子の左側
+	prefixParseFn func() ast.Expression               // 前置構文解析関数
+	infixParseFn  func(ast.Expression) ast.Expression // 中置構文解析関数 引数は中置演算子の左側
 )
 
 func New(l *lexer.Lexer) *Parser {
@@ -103,7 +103,7 @@ func (p *Parser) parseIntergerLiteral() ast.Expression {
 	}
 
 	lit.Value = value
-	
+
 	return lit
 }
 
@@ -113,7 +113,7 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
 	expression := &ast.PrefixExpression{
-	    Token:    p.curToken,
+		Token:    p.curToken,
 		Operator: p.curToken.Literal,
 	}
 
@@ -228,7 +228,6 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	return identifiers
 }
 
-
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
@@ -295,7 +294,7 @@ func (p *Parser) nextToken() {
 
 func (p *Parser) ParseProgram() *ast.Program {
 	// ASTのルートノードを生成
-	program := &ast.Program{} // &{[]}
+	program := &ast.Program{}              // &{[]}
 	program.Statements = []ast.Statement{} // []
 
 	for p.curToken.Type != token.EOF { // !p.curTokenIs(token.EOF)で代替できる
@@ -385,7 +384,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type] // 0x11551f0 関数
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
-		return  nil
+		return nil
 	}
 	leftExp := prefix() // 1 2
 
@@ -511,7 +510,8 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		return false
 	}
 }
-                                                           // ex) parseIdentifier()
+
+// ex) parseIdentifier()
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 	p.prefixParseFns[tokenType] = fn
 }

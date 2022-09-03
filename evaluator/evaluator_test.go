@@ -1,11 +1,10 @@
 package evaluator
 
-
 import (
 	"Interpreter-made-in-Go-language/lexer"
 	"Interpreter-made-in-Go-language/object"
 	"Interpreter-made-in-Go-language/parser"
-    "testing"
+	"testing"
 )
 
 func TestEvalIntegerExpression(t *testing.T) {
@@ -499,7 +498,7 @@ func testEval(input string) object.Object {
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
 
-    return Eval(program, env)
+	return Eval(program, env)
 }
 
 func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {

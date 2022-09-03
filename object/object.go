@@ -1,11 +1,11 @@
 package object
 
 import (
+	"Interpreter-made-in-Go-language/ast"
 	"bytes"
 	"fmt"
-	"Interpreter-made-in-Go-language/ast"
-	"strings"
 	"hash/fnv"
+	"strings"
 )
 
 type ObjectType string
@@ -13,16 +13,16 @@ type ObjectType string
 type BuiltinFunction func(args ...Object) Object
 
 const (
-	NULL_OBJ  = "NULL"
-	ERROR_OBJ = "ERROR"
-	INTEGER_OBJ = "INTEGER"
-	BOOLEAN_OBJ = "BOOLEAN"
+	NULL_OBJ         = "NULL"
+	ERROR_OBJ        = "ERROR"
+	INTEGER_OBJ      = "INTEGER"
+	BOOLEAN_OBJ      = "BOOLEAN"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	FUNCTION_OBJ = "FUNCTION"
-	STRING_OBJ = "STRING"
-	BUILTIN_OBJ = "BUILTIN"
-	ARRAY_OBJ = "ARRAY"
-	HASH_OBJ = "HASH"
+	FUNCTION_OBJ     = "FUNCTION"
+	STRING_OBJ       = "STRING"
+	BUILTIN_OBJ      = "BUILTIN"
+	ARRAY_OBJ        = "ARRAY"
+	HASH_OBJ         = "HASH"
 )
 
 type HashKey struct {
@@ -43,7 +43,7 @@ type Integer struct {
 	Value int64
 }
 
-func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
+func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
@@ -71,7 +71,6 @@ type Null struct{}
 
 func (n *Null) Type() ObjectType { return NULL_OBJ }
 func (n *Null) Inspect() string  { return "null" }
-
 
 type ReturnValue struct {
 	Value Object

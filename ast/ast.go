@@ -48,13 +48,14 @@ func (p *Program) String() string {
 type LetStatement struct {
 	Token token.Token // token.LET トークン
 	Name  *Identifier // 識別子(変数名)
-	Value Expression // 値を生成する式
+	Value Expression  // 値を生成する式
 }
 
-// Statementインターフェイスを満たす 
-// parser.go:63:29: cannot use p.parseLetStatement() (type *ast.LetStatement) as type ast.Statement in return argument: 
+// Statementインターフェイスを満たす
+// parser.go:63:29: cannot use p.parseLetStatement() (type *ast.LetStatement) as type ast.Statement in return argument:
 // *ast.LetStatement does not implement ast.Statement (missing ast.statementNode method)エラーを避ける
 func (ls *LetStatement) statementNode() {}
+
 // Nodeインターフェイスを満たす
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
@@ -79,9 +80,9 @@ type Identifier struct {
 	Value string
 }
 
-func (i *Identifier) expressionNode() {}
+func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
-func (i *Identifier) String() string { return i.Value }
+func (i *Identifier) String() string       { return i.Value }
 
 // return <expression>
 type ReturnStatement struct {
@@ -89,7 +90,7 @@ type ReturnStatement struct {
 	ReturnValue Expression
 }
 
-func (rs *ReturnStatement) statementNode() {}
+func (rs *ReturnStatement) statementNode()       {}
 func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
@@ -110,8 +111,8 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (es *ExpressionStatement) statementNode() {}
-func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal}
+func (es *ExpressionStatement) statementNode()       {}
+func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
@@ -124,19 +125,19 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode() {}
+func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
-func (il *IntegerLiteral) String() string { return il.Token.Literal}
+func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 
 // <prefix operator> <expression>
 type PrefixExpression struct {
 	Token    token.Token // 前置トークン、例えば「!」
-	Operator string // 文字列、「"-"」か「"!"」
+	Operator string      // 文字列、「"-"」か「"!"」
 	Right    Expression
 }
 
-func (pe *PrefixExpression) expressionNode() {}
-func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal}
+func (pe *PrefixExpression) expressionNode()      {}
+func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
 func (pe *PrefixExpression) String() string {
 	var out bytes.Buffer
 	out.WriteString("(")
@@ -174,9 +175,9 @@ type Boolean struct {
 	Value bool
 }
 
-func (b *Boolean) expressionNode() {}
+func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
-func (b *Boolean) String() string { return b.Token.Literal }
+func (b *Boolean) String() string       { return b.Token.Literal }
 
 // if (<conditon>) <consequence> else <alternative>
 type IfExpression struct {
